@@ -4,6 +4,7 @@ const sass = require('gulp-sass');
 const cleanCSS = require('gulp-clean-css');
 const autoprefixer = require('gulp-autoprefixer');
 const rename = require("gulp-rename");
+const sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('server', function() {
 
@@ -18,12 +19,22 @@ gulp.task('server', function() {
 
 gulp.task('styles', function() {
     return gulp.src("src/sass/**/*.+(scss|sass)")
-        .pipe(sass({ outputStyle: 'compressed' }).on('error', sass.logError))
-        .pipe(rename({ suffix: '.min', prefix: '' }))
-        .pipe(autoprefixer())
-        .pipe(cleanCSS({ compatibility: 'ie8' }))
-        .pipe(gulp.dest("src/css"))
-        .pipe(browserSync.stream());
+    .pipe(sourcemaps.init())
+    .pipe(sass({
+      errLogToConsole: true,
+      outputStyle: 'compressed'
+    }).on('error', console.error.bind(console)))
+    .pipe(rename({
+      suffix: '.min',
+      prefix: ''
+    }))
+    .pipe(autoprefixer())
+    .pipe(cleanCSS({
+      compatibility: 'ie8'
+    }))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest("src/css"))
+    .pipe(browserSync.stream())
 });
 
 gulp.task('watch', function() {
